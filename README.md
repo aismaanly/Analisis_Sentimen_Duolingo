@@ -1,6 +1,7 @@
 # Duolingo Sentiment Analysis 🦉
 
 ![Duolingo](src/thumb.png)
+![Gif Dasboard](src/gif-dashboard.gif)
 
 This project focuses on performing sentiment analysis on user reviews of the Duolingo application on the Google Play Store (specifically targeting Indonesian reviews). The project encompasses the complete pipeline from **Data Scraping**, **Data Preprocessing & Lexicon Labeling**, **Machine Learning & Deep Learning Modeling** (MLP, SimpleRNN, LSTM), to an **Interactive Streamlit Web Dashboard** featuring a modern, glassmorphic UI.
 
