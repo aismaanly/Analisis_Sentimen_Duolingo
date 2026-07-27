@@ -61,11 +61,16 @@ def load_css():
             color: #cbd5e1;
         }
 
-        /* Sidebar Glassmorphism */
+        /* Sidebar Glassmorphism & Sembunyikan Navigasi Bawaan Streamlit */
         section[data-testid="stSidebar"] {
             background-color: rgba(11, 19, 41, 0.85) !important;
             border-right: 1px solid rgba(88, 204, 2, 0.2) !important;
             backdrop-filter: blur(20px);
+        }
+
+        /* Menyembunyikan menu bawaan Streamlit di atas sidebar secara otomatis */
+        div[data-testid="stSidebarNav"] {
+            display: none !important;
         }
 
         /* Metric Cards Kustom */
