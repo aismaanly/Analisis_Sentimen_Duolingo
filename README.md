@@ -1,51 +1,104 @@
 # Duolingo Sentiment Analysis 🦉
 
-This project focuses on performing sentiment analysis on user reviews of the Duolingo application on the Google Play Store (specifically targeting Indonesian reviews). The project is divided into two primary phases: **Data Scraping** (collecting reviews) and **Sentiment Analysis** (data cleaning, lexicon-based labeling, and Machine Learning/Deep Learning modeling).
+![Duolingo](src/thumb.png)
+
+This project focuses on performing sentiment analysis on user reviews of the Duolingo application on the Google Play Store (specifically targeting Indonesian reviews). The project encompasses the complete pipeline from **Data Scraping**, **Data Preprocessing & Lexicon Labeling**, **Machine Learning & Deep Learning Modeling** (MLP, SimpleRNN, LSTM), to an **Interactive Streamlit Web Dashboard** featuring a modern, glassmorphic UI.
+
+---
 
 ## 🗂️ Project Structure
 
-- `Scraping_Duolingo.ipynb`: A Jupyter Notebook used to scrape user reviews from the Google Play Store using the `google-play-scraper` library.
-- `Analisis_Sentimen_Duolingo.ipynb`: The main Jupyter Notebook containing the end-to-end NLP pipeline. This includes text preprocessing, lexicon-based sentiment labeling, and the implementation/evaluation of multiple machine learning and deep learning models.
-- `duolingo_review.csv`: The raw dataset containing the scraped reviews.
-- `processed_review.csv`: The cleaned and preprocessed dataset, ready for model training (contains tokenized and lemmatized texts).
-- `requirements.txt`: A list of required Python dependencies to run this project.
+```
+Analisis_Sentimen_Duolingo/
+ ├── main.py                     # Main Streamlit web application entry point
+ ├── prd.md                      # Product Requirement Document for the Streamlit dashboard
+ ├── requirements.txt            # Clean list of project dependencies
+ ├── README.md                   # Project documentation
+ ├── .gitignore                  # Git ignore file for cache, env, and temporary files
+ ├── .streamlit/                 # Streamlit configuration (custom sidebar navigation)
+ ├── src/                        # UI Theme and Utility modules
+ │    ├── __init__.py
+ │    ├── themes.py              # Glassmorphism CSS & Vibrant Duolingo Color Palette
+ │    └── utils.py               # Cached data loader, text preprocessor, & sidebar renderer
+ ├── pages/                      # Multi-Page Navigation Modules (Streamlit)
+ │    ├── overview.py            # Overview & KPI summary cards
+ │    ├── eda.py                 # Exploratory Data Analysis & Rating vs Sentiment
+ │    ├── text_insights.py       # Interactive WordCloud & Top 15 Word Frequency
+ │    ├── model_evaluation.py    # Model benchmarking (MLP vs SimpleRNN vs LSTM)
+ │    ├── live_prediction.py     # Real-time interactive sentiment inference
+ │    └── data_explorer.py       # Data explorer with multi-column filter & CSV export
+ └── data/                       # Datasets & Jupyter Notebooks
+      ├── Scraping_Duolingo.ipynb        # Play Store review scraper notebook
+      ├── Analisis_Sentimen_Duolingo.ipynb# NLP & ML/DL training notebook
+      ├── duolingo_review.csv            # Scraped raw review dataset (~45,000 rows)
+      └── processed_review.csv           # Preprocessed dataset with sentiment labels
+```
 
-## 🚀 Workflow
+---
+
+## 🚀 Workflow & Features
 
 ### 1. Data Scraping
-We use `google-play-scraper` to extract thousands of reviews from the Google Play Store (`com.duolingo`). Key metrics, such as the review text (*content*) and rating score, are scraped and saved into `duolingo_review.csv`.
+Reviews were scraped from the Google Play Store (`com.duolingo`) using the `google-play-scraper` library. Key attributes such as review text (`content`) and star ratings (`score`) were saved to `data/duolingo_review.csv`.
 
-### 2. Data Preprocessing & Text Pre-Processing
-We clean the data and process the Indonesian text so that it can be optimally understood by our machine learning models:
-- **Data Cleaning**: Removing unneeded columns, missing values (NaN), and duplicate entries.
-- **Lowercasing & Cleansing**: Converting text to lowercase and removing punctuation and numerical noise.
-- **Slang Replacement**: Mapping informal language and Indonesian slang into standardized words.
-- **Tokenization & Stopwords Removal**: Splitting sentences into tokens (words) and removing meaningless words (stopwords).
-- **Stemming / Lemmatization**: Utilizing the `MPStemmer` library (developed specifically for the Indonesian language) to convert words into their base forms.
+### 2. Data Preprocessing & Text Cleansing
+Indonesian review texts undergo a thorough NLP preprocessing pipeline:
+- **Data Cleaning**: Dropping missing values (`NaN`), unneeded columns, and duplicate entries.
+- **Lowercasing & Cleansing**: Removing URLs, special symbols, punctuation, and numerical noise.
+- **Slang Replacement**: Normalizing informal Indonesian slang and typos into standard words.
+- **Tokenization & Stopword Removal**: Splitting sentences into token arrays and removing low-information Indonesian stopwords.
+- **Stemming / Lemmatization**: Applying `MPStemmer` (developed specifically for the Indonesian language) to convert words into their base forms.
 
-### 3. Data Labeling (Lexicon-Based)
-To assign a sentiment target (Positive, Negative, or Neutral) to the unlabeled reviews, this project leverages an **Indonesian Sentiment Lexicon Dictionary**. The sentiment score for each document is calculated by summing the positive and negative lexicon values of the constituent words. Visualizations of the final sentiment distributions and Word Clouds for each sentiment category are also included.
+### 3. Data Labeling & Sentiment Categorization
+Reviews are categorized into three sentiment classes based on rating scores and lexicon analysis:
+- 🟢 **Positif**: Score 4–5 Stars
+- 🟡 **Netral**: Score 3 Stars
+- 🔴 **Negatif**: Score 1–2 Stars
 
-### 4. Feature Extraction and Modeling
-We built and compared several combinations of text feature extraction techniques and sequence models:
-1. **Multilayer Perceptron (MLP) + TF-IDF Vectorizer**: A standard feed-forward Artificial Neural Network baseline.
-2. **Long Short-Term Memory (LSTM) + TF-IDF Vectorizer**: A Deep Learning RNN variant adapted to retain long-term dependencies over extended review sequences. It also leverages custom callbacks to halt training when hitting specific validation thresholds.
-3. **Simple Recurrent Neural Network (RNN) + Bag of Words (BoW)**: A fundamental sequence model architecture relying on sequential Bag-of-Words features.
+### 4. Machine Learning & Deep Learning Modeling
+Three algorithms are trained and evaluated on the preprocessed texts:
+1. **MLPClassifier (Multi-Layer Perceptron)** + TF-IDF Vectorizer
+2. **SimpleRNN (Recurrent Neural Network)** + Keras Embedding
+3. **LSTM (Long Short-Term Memory)** + Keras Embedding *(Best Model: 88.5% Accuracy)*
 
-Model performances are evaluated based on their **Validation Accuracy** and **Test Accuracy** to measure generalization robustness.
+---
 
-## 🛠️ Dependencies
+## 📊 Interactive Streamlit Dashboard (`main.py`)
 
-You need to install the project dependencies, ideally within a virtual environment. Use `requirements.txt` to install all necessary packages:
+The application features a modern **Glassmorphism UI** inspired by RAGsume, incorporating a single unified sidebar menu with 6 interactive pages:
+
+1. **📊 Overview & KPI**: Key statistics (Total reviews, average rating, percentage of positive, neutral, and negative sentiment).
+2. **📈 EDA & Distribution**: Donut charts, star rating vs sentiment cross-tabulation, and review length histograms.
+3. **🔤 Text Insights & WordCloud**: Interactive WordClouds for Positive, Neutral, and Negative sentiments alongside Top 15 word frequency bar charts.
+4. **🤖 Model Evaluation**: Benchmarking bar charts, metric comparison tables (Accuracy, Precision, Recall, F1-Score), and Confusion Matrix heatmaps.
+5. **🧪 Live Prediction**: Real-time interactive text input form to predict review sentiment with confidence probability gauges.
+6. **📑 Data Explorer**: Interactive data table with keyword searching, sentiment filtering, star rating filtering, and CSV export.
+
+---
+
+## 🛠️ Installation & Dependencies
+
+Install all required Python packages using `requirements.txt`:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Key NLP and Machine Learning libraries used in this project include `Sastrawi/MPStemmer`, `nltk`, `wordcloud`, `scikit-learn`, and `TensorFlow`.
+Key dependencies: `streamlit`, `pandas`, `numpy`, `plotly`, `matplotlib`, `wordcloud`, `scikit-learn`, `tensorflow`, `nltk`, `emoji`, `google-play-scraper`, `mpstemmer`.
+
+---
 
 ## ▶️ How to Run
 
-1. Install all required dependencies using the command above.
-2. *(Optional)* Run all cells in `Scraping_Duolingo.ipynb` if you wish to scrape recent data and overwrite `duolingo_review.csv`.
-3. Open `Analisis_Sentimen_Duolingo.ipynb`. Run all cells from top to bottom. The notebook will automatically process the raw `.csv` file, perform text preprocessing and sentiment labeling, and ultimately train and evaluate the MLP, LSTM, and RNN models.
+### 1. Launch the Streamlit Web Application (Recommended)
+To run the interactive dashboard locally:
+
+```bash
+streamlit run main.py
+```
+
+Open `http://localhost:8501` in your browser.
+
+### 2. Run Notebooks (Optional)
+- **Scraping**: Open `data/Scraping_Duolingo.ipynb` to re-scrape new reviews from the Play Store.
+- **Training & Analysis**: Open `data/Analisis_Sentimen_Duolingo.ipynb` to execute the full NLP preprocessing, lexicon labeling, and model training workflow.
